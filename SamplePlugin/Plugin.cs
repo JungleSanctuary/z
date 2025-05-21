@@ -121,15 +121,58 @@ public sealed class Plugin : IDalamudPlugin
         // Update player data periodically
         if (DateTime.Now - _lastUpdateTime > _updateInterval)
         {
-            // UpdatePlayerData(); // Removed, as this method does not exist
+            UpdatePlayerData(); // Now implemented
             _lastUpdateTime = DateTime.Now;
         }
 
         WindowSystem.Draw();
     }
 
-    public void ToggleConfigUI() => ConfigWindow.Toggle();
-    public void ToggleMainUI() => MainWindow.Toggle();
+    // Method to update player data from party and nearby players
+    private void UpdatePlayerData()
+    {
+        if (!ClientState.IsLoggedIn || ClientState.LocalPlayer == null)
+            return;
+
+        try
+        {
+            // Update party members
+            if (Configuration.ShowPartyMembers)
+            {
+                MainWindow.PartyMembers = GetPartySpRouters();
+            }
+            else
+            {
+                MainWindow.PartyMembers = new List<PlayerInfo>();
+            }
+
+            // Update nearby players
+            if (Configuration.ShowNearbyPlayers)
+            {
+                var nearbyPlayers = GetNearbySpRouters();
+                
+                // Filter by distance and limit the number if configured
+                if (ClientState.LocalPlayer != null)
+                {
+                    nearbyPlayers = nearbyPlayers
+                        .Where(p => GetDistance(p.Position, ClientState.LocalPlayer.Position) <= Configuration.NearbyPlayerRadius)
+                        .OrderBy(p => GetDistance(p.Position, ClientState.LocalPlayer.Position))
+                        .Take(Configuration.MaxNearbyPlayers)
+                        .ToList();
+                }
+                
+                MainWindow.NearbyPlayers = nearbyPlayers;
+            }
+            else
+            {
+                MainWindow.NearbyPlayers = new List<PlayerInfo>();
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error updating player data");
+        }
+    }
 
     // Get all sprouts and returners in party
     // Fix the GetPartySpRouters method to use correct properties
@@ -290,5 +333,7 @@ public sealed class Plugin : IDalamudPlugin
 
         return (Configuration.ShowSprouts && IsSprout(playerObj)) ||
                (Configuration.ShowReturners && IsReturner(playerObj));
-    }
+    }    // Add proper toggle methods
+    public void ToggleConfigUI() => ConfigWindow.Toggle();
+    public void ToggleMainUI() => MainWindow.Toggle();
 }

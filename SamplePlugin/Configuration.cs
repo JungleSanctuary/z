@@ -22,6 +22,7 @@ public class Configuration : IPluginConfiguration
     public bool ShowNearbyPlayers { get; set; } = true;
     public bool ShowSprouts { get; set; } = true;
     public bool ShowReturners { get; set; } = true;
+    public float DetectionRadius { get; set; } = 30.0f;
     public float NearbyPlayerRadius { get; set; } = 30.0f;
     public int MaxNearbyPlayers { get; set; } = 20;
     

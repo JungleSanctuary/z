@@ -14,6 +14,10 @@ namespace SamplePlugin.Windows;
 public class MainWindow : Window, IDisposable
 {
     private Plugin Plugin;
+    
+    // Properties for cached player lists
+    public List<PlayerInfo> PartyMembers { get; set; } = new List<PlayerInfo>();
+    public List<PlayerInfo> NearbyPlayers { get; set; } = new List<PlayerInfo>();
 
     public MainWindow(Plugin plugin)
         : base("Sprout Tracker")
@@ -54,13 +58,11 @@ public class MainWindow : Window, IDisposable
         Plugin.Configuration.MainWindowSize = currentSize;
         Plugin.Configuration.MainWindowPosition = currentPosition;
         Plugin.Configuration.Save();
-    }
-
-    public override void Draw()
+    }    public override void Draw()
     {
-        // Get players of interest
-        var partyPlayers = Plugin.GetPartySpRouters();
-        var nearbyPlayers = Plugin.GetNearbySpRouters();
+        // Use cached player lists from UpdatePlayerData
+        var partyPlayers = PartyMembers;
+        var nearbyPlayers = NearbyPlayers;
 
         bool hasPartyPlayers = partyPlayers.Count > 0;
         bool hasNearbyPlayers = nearbyPlayers.Count > 0;
