@@ -18,8 +18,8 @@
     "IconUrl": "",
     "IsHide": false,
     "IsTestingExclusive": false,    "LastUpdated": "1714676400",
-    "DownloadLinkInstall": "https://codeberg.org/InTheWind21/simple1/raw/branch/master/latest.zip",
-    "DownloadLinkUpdate": "https://codeberg.org/InTheWind21/simple1/raw/branch/master/latest.zip",
-    "DownloadLinkTesting": "https://codeberg.org/InTheWind21/simple1/raw/branch/master/latest.zip"
+    "DownloadLinkInstall": "https://codeberg.org/InTheWind21/simple1/releases/download/v1.0.0/latest.zip",
+    "DownloadLinkUpdate": "https://codeberg.org/InTheWind21/simple1/releases/download/v1.0.0/latest.zip",
+    "DownloadLinkTesting": "https://codeberg.org/InTheWind21/simple1/releases/download/v1.0.0/latest.zip"
   }
 ]
