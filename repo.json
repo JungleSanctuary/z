@@ -17,10 +17,9 @@
     ],
     "IconUrl": "",
     "IsHide": false,
-    "IsTestingExclusive": false,
-    "LastUpdated": "1714676400",
-    "DownloadLinkInstall": "https://codeberg.org/api/v1/repos/InTheWind21/simple1/raw/latest.zip",
-    "DownloadLinkUpdate": "https://codeberg.org/api/v1/repos/InTheWind21/simple1/raw/latest.zip",
-    "DownloadLinkTesting": "https://codeberg.org/api/v1/repos/InTheWind21/simple1/raw/latest.zip"
+    "IsTestingExclusive": false,    "LastUpdated": "1714676400",
+    "DownloadLinkInstall": "https://codeberg.org/InTheWind21/simple1/raw/branch/master/latest.zip",
+    "DownloadLinkUpdate": "https://codeberg.org/InTheWind21/simple1/raw/branch/master/latest.zip",
+    "DownloadLinkTesting": "https://codeberg.org/InTheWind21/simple1/raw/branch/master/latest.zip"
   }
 ]
