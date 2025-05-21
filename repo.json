@@ -6,7 +6,7 @@
     "Description": "Displays information about sprouts and returning players in your current party and surrounding area, helping mentors and helpful players identify who might need assistance.",
     "InternalName": "SamplePlugin",
     "AssemblyVersion": "1.0.0.0",
-    "RepoUrl": "https://codeberg.org/InTheWind21/simple1.git",
+    "RepoUrl": "https://github.com/JungleSanctuary/z",
     "ApplicableVersion": "any",
     "DalamudApiLevel": 12,
     "Tags": [
@@ -17,9 +17,8 @@
     ],
     "IconUrl": "",
     "IsHide": false,
-    "IsTestingExclusive": false,    "LastUpdated": "1714676400",
-    "DownloadLinkInstall": "https://codeberg.org/InTheWind21/simple1/releases/download/v1.0.0/latest.zip",
-    "DownloadLinkUpdate": "https://codeberg.org/InTheWind21/simple1/releases/download/v1.0.0/latest.zip",
-    "DownloadLinkTesting": "https://codeberg.org/InTheWind21/simple1/releases/download/v1.0.0/latest.zip"
+    "IsTestingExclusive": false,    "LastUpdated": "1714676400",    "DownloadLinkInstall": "https://github.com/JungleSanctuary/z/releases/download/v1.0.0/latest.zip",
+    "DownloadLinkUpdate": "https://github.com/JungleSanctuary/z/releases/download/v1.0.0/latest.zip",
+    "DownloadLinkTesting": "https://github.com/JungleSanctuary/z/releases/download/v1.0.0/latest.zip"
   }
 ]
