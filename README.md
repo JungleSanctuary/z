@@ -17,7 +17,7 @@ This plugin is designed for the experimental tab in Dalamud. To install:
 
 1. Add the following URL to your list of custom plugin repositories in Dalamud Settings > Experimental:
    ```
-   https://codeberg.org/InTheWind21/simple1/raw/main/repo.json
+   https://github.com/JungleSanctuary/z/raw/main/repo.json
    ```
 
 2. Search for "Sprout Tracker" in the plugin installer and install it
