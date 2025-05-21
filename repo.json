@@ -4,7 +4,7 @@
     "Name": "Simple Plugin",
     "Punchline": "A simple plugin with a basic window.",
     "Description": "This plugin displays a basic window on the game screen. Use /simple to toggle the window.",
-    "InternalName": "SimplePlugin",
+    "InternalName": "SamplePlugin",
     "AssemblyVersion": "1.0.0.0",
     "RepoUrl": "https://codeberg.org/InTheWind21/simple1.git",
     "ApplicableVersion": "any",

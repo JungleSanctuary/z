@@ -2,16 +2,20 @@
   "Author": "InTheWind21",
   "Name": "Simple Plugin",
   "InternalName": "SamplePlugin",
-  "Punchline": "A simple plugin with a basic window.",
+  "AssemblyVersion": "1.0.0.0",
   "Description": "This plugin displays a basic window on the game screen. Use /simple to toggle the window.",
   "ApplicableVersion": "any",
+  "RepoUrl": "https://codeberg.org/InTheWind21/simple1.git",
   "Tags": [
     "simple",
     "ui",
     "window"
   ],
   "DalamudApiLevel": 9,
-  "IsHide": false,
-  "IsTestingExclusive": true,
-  "RepoUrl": "https://codeberg.org/InTheWind21/simple1.git"
+  "LoadRequiredState": 0,
+  "LoadSync": false,
+  "CanUnloadAsync": false,
+  "LoadPriority": 0,
+  "Punchline": "A simple plugin with a basic window.",
+  "AcceptsFeedback": true
 }
