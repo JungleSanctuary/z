@@ -1,0 +1,14 @@
+{
+  "Author": "InTheWind21",
+  "Name": "Enhanced Zoom",
+  "Punchline": "Extend your camera zoom beyond the game's limits",
+  "Description": "Enhances the camera zoom functionality in FFXIV, allowing for greater viewing distance and screenshot capabilities.",
+  "ApplicableVersion": "any",
+  "RepoUrl": "https://codeberg.org/InTheWind21/AnotherZoomHack",
+  "Tags": [
+    "camera",
+    "zoom",
+    "screenshot",
+    "utility"
+  ]
+}

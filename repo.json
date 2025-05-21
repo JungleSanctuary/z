@@ -8,7 +8,7 @@
     "AssemblyVersion": "1.0.0.0",
     "RepoUrl": "https://codeberg.org/InTheWind21/simple1.git",
     "ApplicableVersion": "any",
-    "DalamudApiLevel": 9,
+    "DalamudApiLevel": 12,
     "Tags": [
       "simple",
       "ui",
@@ -16,9 +16,10 @@
     ],
     "IconUrl": "",
     "IsHide": false,
-    "IsTestingExclusive": true,
-    "LastUpdated": "2025-05-21",
-    "DownloadLinkInstall": "https://codeberg.org/InTheWind21/simple1/raw/branch/main/latest.zip",
-    "DownloadLinkUpdate": "https://codeberg.org/InTheWind21/simple1/raw/branch/main/latest.zip"
+    "IsTestingExclusive": false,
+    "LastUpdated": "1714676400",
+    "DownloadLinkInstall": "https://codeberg.org/api/v1/repos/InTheWind21/simple1/raw/latest.zip",
+    "DownloadLinkUpdate": "https://codeberg.org/api/v1/repos/InTheWind21/simple1/raw/latest.zip",
+    "DownloadLinkTesting": "https://codeberg.org/api/v1/repos/InTheWind21/simple1/raw/latest.zip"
   }
 ]
