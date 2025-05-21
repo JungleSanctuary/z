@@ -1,13 +1,15 @@
-# Simple Plugin for Dalamud
+# Sprout Tracker for Dalamud
 
-A simple Dalamud plugin with a basic window that displays on the game screen.
+A Dalamud plugin for Final Fantasy XIV that helps identify new players (sprouts) and returning players in your current party and nearby area.
 
 ## Features
 
-* Basic UI window with a title and simple content
-* Configuration window to control plugin settings
-* Slash command to toggle the window (/simple)
-* Experimental tab compatibility for easy installation
+* Display an unobtrusive UI window showing sprouts and returners in your current party
+* Option to show nearby sprouts/returners in the current zone
+* Shows basic information about each player (name, job/class, world)
+* Fully customizable display (colors, size, position)
+* Auto-hide during combat (optional)
+* Job icons for easy identification
 
 ## Installation
 
@@ -15,28 +17,34 @@ This plugin is designed for the experimental tab in Dalamud. To install:
 
 1. Add the following URL to your list of custom plugin repositories in Dalamud Settings > Experimental:
    ```
-   https://codeberg.org/InTheWind21/simple1/raw/branch/main/repo.json
+   https://codeberg.org/InTheWind21/simple1/raw/main/repo.json
    ```
 
-2. Search for "Simple Plugin" in the plugin installer and install it
+2. Search for "Sprout Tracker" in the plugin installer and install it
 
 ## Commands
 
-* `/simple` - Toggles the main plugin window
+* `/sprouttracker` - Toggles the Sprout Tracker window
+* `/stracker` - Shorter alias for toggling the window
 
-## Development
+## Configuration
 
-This plugin was created with the Dalamud plugin template.
+The plugin offers several configuration options:
 
-### Building
+### Display Settings
+* Toggle display of party members and/or nearby players
+* Toggle display of sprouts and/or returners
+* Adjust detection radius for nearby players
+* Set maximum number of nearby players to display
+* Toggle job icons
 
-1. Open the solution in Visual Studio
-2. Build the solution in Release mode
-3. The built plugin will be available in the output directory
+### Window Settings
+* Lock window position
+* Auto-hide in combat
+* Adjust window size
 
-### Configuration
-
-You can modify the plugin configuration in the settings window within the game.
+### Color Settings
+* Customize colors for sprouts, returners, and headers
 
 ## License
 

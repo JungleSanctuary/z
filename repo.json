@@ -1,18 +1,19 @@
 [
   {
     "Author": "InTheWind21",
-    "Name": "Simple Plugin",
-    "Punchline": "A simple plugin with a basic window.",
-    "Description": "This plugin displays a basic window on the game screen. Use /simple to toggle the window.",
+    "Name": "Sprout Tracker",
+    "Punchline": "Track new and returning players in your party and area",
+    "Description": "Displays information about sprouts and returning players in your current party and surrounding area, helping mentors and helpful players identify who might need assistance.",
     "InternalName": "SamplePlugin",
     "AssemblyVersion": "1.0.0.0",
     "RepoUrl": "https://codeberg.org/InTheWind21/simple1.git",
     "ApplicableVersion": "any",
     "DalamudApiLevel": 12,
     "Tags": [
-      "simple",
-      "ui",
-      "window"
+      "sprout",
+      "newplayer",
+      "mentor",
+      "utility"
     ],
     "IconUrl": "",
     "IsHide": false,

@@ -1,0 +1,184 @@
+using System;
+using System.Numerics;
+using Dalamud.Interface.Utility;
+using Dalamud.Interface.Utility.Raii;
+using Dalamud.Interface.Windowing;
+using ImGuiNET;
+using System.Collections.Generic;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Plugin.Services;
+using Dalamud.Interface;
+
+namespace SamplePlugin.Windows;
+
+public class MainWindow : Window, IDisposable
+{
+    private Plugin Plugin;
+
+    public MainWindow(Plugin plugin)
+        : base("Sprout Tracker")
+    {
+        Plugin = plugin;
+
+        // Use configuration for window sizing
+        SizeConstraints = new WindowSizeConstraints
+        {
+            MinimumSize = new Vector2(250, 200),
+            MaximumSize = new Vector2(float.MaxValue, float.MaxValue)
+        };
+        
+        Size = Plugin.Configuration.MainWindowSize;
+        Position = Plugin.Configuration.MainWindowPosition;
+        
+        // Configure window flags
+        Flags = ImGuiWindowFlags.NoScrollbar;
+        
+        if (Plugin.Configuration.LockMainWindowPosition)
+            Flags |= ImGuiWindowFlags.NoMove;
+    }
+
+    public void Dispose() { }
+    
+    // Save window position and size when closing
+    public override void OnClose()
+    {
+        Plugin.Configuration.MainWindowSize = Size;
+        Plugin.Configuration.MainWindowPosition = Position;
+        Plugin.Configuration.Save();
+    }
+
+    public override void Draw()
+    {
+        // Get players of interest
+        var partyPlayers = Plugin.GetPartySpRouters();
+        var nearbyPlayers = Plugin.GetNearbySpRouters();
+        
+        bool hasPartyPlayers = partyPlayers.Count > 0;
+        bool hasNearbyPlayers = nearbyPlayers.Count > 0;
+        
+        // No sprouts or returners found
+        if (!hasPartyPlayers && !hasNearbyPlayers)
+        {
+            ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1.0f), "No sprouts or returners found.");
+            return;
+        }
+        
+        // Display party sprouts and returners
+        if (Plugin.Configuration.ShowPartyMembers)
+        {
+            DrawPlayerSection("Party Members", partyPlayers, hasPartyPlayers);
+        }
+        
+        // Display nearby sprouts and returners
+        if (Plugin.Configuration.ShowNearbyPlayers)
+        {
+            DrawPlayerSection("Nearby Players", nearbyPlayers, hasNearbyPlayers);
+        }
+    }
+    
+    private void DrawPlayerSection(string title, List<Dalamud.Game.ClientState.Objects.Types.GameObject> players, bool hasPlayers)
+    {
+        // Section header
+        ImGui.Separator();
+        ImGui.TextColored(Plugin.Configuration.HeaderColor, title);
+        ImGui.Separator();
+        
+        // No players in this section
+        if (!hasPlayers)
+        {
+            ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1.0f), $"No sprouts or returners found in {title.ToLower()}.");
+            return;
+        }
+        
+        // Begin a child region for scrolling
+        using (var childRegion = ImRaii.Child($"##ScrollRegion{title}", new Vector2(-1, 0), true))
+        {
+            if (childRegion.Success)
+            {
+                // Draw table
+                if (ImGui.BeginTable($"##Table{title}", Plugin.Configuration.ShowJobIcons ? 4 : 3, ImGuiTableFlags.RowBg))
+                {
+                    // Set up columns
+                    if (Plugin.Configuration.ShowJobIcons)
+                        ImGui.TableSetupColumn("Job", ImGuiTableColumnFlags.WidthFixed, 25);
+                    
+                    ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.None);
+                    ImGui.TableSetupColumn("World", ImGuiTableColumnFlags.WidthFixed, 80);
+                    ImGui.TableSetupColumn("Status", ImGuiTableColumnFlags.WidthFixed, 70);
+                    
+                    // Display players
+                    foreach (var player in players)
+                    {
+                        ImGui.TableNextRow();
+                        
+                        // Job icon
+                        if (Plugin.Configuration.ShowJobIcons)
+                        {
+                            ImGui.TableNextColumn();
+                            
+                            // Try to display job icon
+                            try
+                            {
+                                var jobIconId = GetJobIconIdForPlayer(player);
+                                var jobIcon = Plugin.TextureProvider.GetIcon(jobIconId);
+                                
+                                if (jobIcon != null)
+                                {
+                                    ImGui.Image(jobIcon.ImGuiHandle, new Vector2(20, 20));
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                // If job icon fails to load, just skip it
+                                Plugin.Log.Error(ex, "Failed to load job icon");
+                            }
+                        }
+                        
+                        // Name
+                        ImGui.TableNextColumn();
+                        ImGui.Text(player.Name.TextValue);
+                        
+                        // World
+                        ImGui.TableNextColumn();
+                        ImGui.Text(GetPlayerWorldName(player));
+                        
+                        // Status
+                        ImGui.TableNextColumn();
+                        bool isSprout = Plugin.IsSprout(player);
+                        bool isReturner = Plugin.IsReturner(player);
+                        
+                        if (isSprout)
+                        {
+                            ImGui.TextColored(Plugin.Configuration.SproutColor, "Sprout");
+                        }
+                        else if (isReturner)
+                        {
+                            ImGui.TextColored(Plugin.Configuration.ReturnerColor, "Returner");
+                        }
+                    }
+                    
+                    ImGui.EndTable();
+                }
+            }
+        }
+    }
+    
+    private string GetPlayerWorldName(Dalamud.Game.ClientState.Objects.Types.GameObject player)
+    {
+        // This is a placeholder and would need game-specific implementation
+        // Depending on the Dalamud API version, you might need to use different methods
+        return "Unknown";
+    }
+    
+    private uint GetJobIconIdForPlayer(Dalamud.Game.ClientState.Objects.Types.GameObject player)
+    {
+        // Default to unknown
+        uint iconId = 62101;
+        
+        // In a real implementation, you would get job or class ID from player
+        // This is a placeholder as the actual implementation depends on the game's API
+        
+        // Simple implementation for example purposes - returns default icon
+        return iconId;
+    }
+}

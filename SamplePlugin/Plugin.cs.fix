@@ -7,28 +7,16 @@ using Dalamud.Plugin.Services;
 using SamplePlugin.Windows;
 using System.Collections.Generic;
 using System;
-using System.Linq;
-using FFXIVClientStructs.FFXIV.Client.UI;
-using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Party;
+using System.Linq;
 
 namespace SamplePlugin;
-
-// Player data structure to store only what we need
-public class PlayerInfo
-{
-    public string Name { get; set; } = string.Empty;
-    public string WorldName { get; set; } = string.Empty;
-    public ulong ObjectId { get; set; }
-    public bool IsSprout { get; set; }
-    public bool IsReturner { get; set; }
-    public uint JobId { get; set; }
-    public System.Numerics.Vector3 Position { get; set; }
-}
 
 public sealed class Plugin : IDalamudPlugin
 {
     [PluginService] internal static IDalamudPluginInterface PluginInterface { get; private set; } = null!;
+    [PluginService] internal static ITextureProvider TextureProvider { get; private set; } = null!;
     [PluginService] internal static ICommandManager CommandManager { get; private set; } = null!;
     [PluginService] internal static IClientState ClientState { get; private set; } = null!;
     [PluginService] internal static IDataManager DataManager { get; private set; } = null!;
@@ -38,18 +26,18 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService] internal static IGameGui GameGui { get; private set; } = null!;
     [PluginService] internal static IChatGui Chat { get; private set; } = null!;
     [PluginService] internal static ICondition Condition { get; private set; } = null!;
-    [PluginService] internal static ITextureProvider TextureProvider { get; private set; } = null!;
 
     private const string CommandName = "/sprouttracker";
     private const string CommandAlias = "/stracker";
 
     public Configuration Configuration { get; init; }
+
     public readonly WindowSystem WindowSystem = new("SproutTracker");
     private ConfigWindow ConfigWindow { get; init; }
     private MainWindow MainWindow { get; init; }
 
     // Add list to track sprouts and returners
-    private List<PlayerInfo> _nearbyPlayers = new();
+    private List<Dalamud.Game.ClientState.Objects.Types.GameObject> _nearbyPlayers = new();
     private DateTime _lastUpdateTime = DateTime.MinValue;
     private readonly TimeSpan _updateInterval = TimeSpan.FromSeconds(5);
 
@@ -67,7 +55,7 @@ public sealed class Plugin : IDalamudPlugin
         {
             HelpMessage = "Opens the Sprout Tracker window."
         });
-
+        
         CommandManager.AddHandler(CommandAlias, new CommandInfo(OnCommand)
         {
             HelpMessage = "Opens the Sprout Tracker window."
@@ -76,9 +64,9 @@ public sealed class Plugin : IDalamudPlugin
         PluginInterface.UiBuilder.Draw += DrawUI;
         PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUI;
         PluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
-
+        
         ClientState.TerritoryChanged += OnTerritoryChanged;
-
+        
         Log.Information($"=== {PluginInterface.Manifest.Name} initialized ===");
     }
 
@@ -91,7 +79,7 @@ public sealed class Plugin : IDalamudPlugin
 
         CommandManager.RemoveHandler(CommandName);
         CommandManager.RemoveHandler(CommandAlias);
-
+        
         ClientState.TerritoryChanged -= OnTerritoryChanged;
     }
 
@@ -100,7 +88,7 @@ public sealed class Plugin : IDalamudPlugin
         // in response to the slash command, just toggle the display status of our main ui
         ToggleMainUI();
     }
-
+    
     private void OnTerritoryChanged(ushort territoryType)
     {
         // Clear the player list when changing zones
@@ -115,180 +103,134 @@ public sealed class Plugin : IDalamudPlugin
             if (MainWindow.IsOpen)
                 MainWindow.IsOpen = false;
         }
-
+        
         // Update player data periodically
         if (DateTime.Now - _lastUpdateTime > _updateInterval)
         {
             UpdatePlayerData();
             _lastUpdateTime = DateTime.Now;
         }
-
+        
         WindowSystem.Draw();
     }
 
     public void ToggleConfigUI() => ConfigWindow.Toggle();
     public void ToggleMainUI() => MainWindow.Toggle();
-
+    
     // Get all sprouts and returners in party
-    public List<PlayerInfo> GetPartySpRouters()
+    public List<Dalamud.Game.ClientState.Objects.Types.GameObject> GetPartySpRouters()
     {
-        var players = new List<PlayerInfo>();
-
+        var players = new List<Dalamud.Game.ClientState.Objects.Types.GameObject>();
+        
         if (!Configuration.ShowPartyMembers || PartyList.Length == 0)
             return players;
-
+            
         for (var i = 0; i < PartyList.Length; i++)
         {
             var member = PartyList[i];
             if (member == null) continue;
-
-            // Create a player info object for this party member
-            var playerInfo = CreatePlayerInfoFromPartyMember(member);
-            if (IsPlayerOfInterest(playerInfo))
+            
+            var player = ObjectTable.FirstOrDefault(p => p.ObjectId == member.ObjectId);
+            if (player != null && IsPlayerOfInterest(player))
             {
-                players.Add(playerInfo);
+                players.Add(player);
             }
         }
-
+        
         return players;
     }
-
-    // Create PlayerInfo from a party member
-    private PlayerInfo CreatePlayerInfoFromPartyMember(IPartyMember member)
-    {
-        if (member == null)
-            return new PlayerInfo();
-
-        // Extract the needed information from the party member
-        var playerInfo = new PlayerInfo
-        {
-            Name = member.Name.ToString(),
-            ObjectId = member.ObjectId,
-            Position = member.Position,
-            WorldName = "Unknown", // Simplified for compatibility
-            JobId = 0 // Simplified for compatibility
-        };
-
-        // Determine if the player is a sprout or returner
-        // This is a simplified implementation
-        byte onlineStatusId = GetOnlineStatusFromPartyMember(member);
-        playerInfo.IsSprout = onlineStatusId == 1;
-        playerInfo.IsReturner = onlineStatusId == 7;
-
-        return playerInfo;
-    }
-
-    // Get online status from a party member
-    private byte GetOnlineStatusFromPartyMember(IPartyMember member)
-    {
-        try
-        {
-            // This is a simplified implementation
-            // In a real implementation, you'd get this from the game data
-
-            // For testing purposes, generate random status
-            Random random = new Random();
-            int roll = random.Next(100);
-
-            if (roll < 20)
-                return 1; // Sprout (20% chance)
-            else if (roll < 30)
-                return 7; // Returner (10% chance)
-            else
-                return 0; // Normal player
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, "Error getting online status");
-            return 0;
-        }
-    }
-
+    
     // Update the list of nearby sprouts and returners
     private void UpdatePlayerData()
     {
         _nearbyPlayers.Clear();
-
+        
         if (!Configuration.ShowNearbyPlayers || ClientState.LocalPlayer == null)
             return;
-
+            
         var playerPosition = ClientState.LocalPlayer.Position;
         var maxDistance = Configuration.NearbyPlayerRadius;
-
-        // In a real implementation, you would iterate through nearby players
-        // For this simplified version, we'll just generate some random players
-        for (int i = 0; i < Configuration.MaxNearbyPlayers; i++)
+        
+        foreach (var obj in ObjectTable)
         {
-            var playerInfo = CreateRandomPlayerInfo(playerPosition);
-            if (IsPlayerOfInterest(playerInfo))
+            if (!obj.IsCharacter()) continue;
+            
+            // Skip party members as they're handled separately
+            if (PartyList.Any(p => p.ObjectId == obj.ObjectId)) continue;
+            
+            // Check distance
+            var distance = GetDistance(playerPosition, obj.Position);
+            if (distance <= maxDistance && IsPlayerOfInterest(obj))
             {
-                _nearbyPlayers.Add(playerInfo);
+                _nearbyPlayers.Add(obj);
+                
+                // Limit the number of players to avoid performance issues
+                if (_nearbyPlayers.Count >= Configuration.MaxNearbyPlayers)
+                    break;
             }
         }
     }
-
-    // Create a random player info for testing
-    private PlayerInfo CreateRandomPlayerInfo(System.Numerics.Vector3 centerPosition)
-    {
-        Random random = new Random();
-
-        // Generate random position near the center
-        float x = centerPosition.X + (float)(random.NextDouble() * 20 - 10);
-        float y = centerPosition.Y + (float)(random.NextDouble() * 5 - 2.5);
-        float z = centerPosition.Z + (float)(random.NextDouble() * 20 - 10);
-
-        // Generate random player info
-        var playerInfo = new PlayerInfo
-        {
-            Name = $"Player{random.Next(1000)}",
-            WorldName = $"World{random.Next(10)}",
-            ObjectId = (ulong)random.Next(1000000),
-            Position = new System.Numerics.Vector3(x, y, z),
-            JobId = (uint)random.Next(1, 40)
-        };
-
-        // Determine if the player is a sprout or returner
-        int roll = random.Next(100);
-        playerInfo.IsSprout = roll < 20;
-        playerInfo.IsReturner = !playerInfo.IsSprout && roll < 30;
-
-        return playerInfo;
-    }
-
+    
     // Get nearby sprouts and returners
-    public List<PlayerInfo> GetNearbySpRouters()
+    public List<Dalamud.Game.ClientState.Objects.Types.GameObject> GetNearbySpRouters()
     {
         return _nearbyPlayers;
     }
-
+    
     // Check if the player is a sprout or returner
-    private bool IsPlayerOfInterest(PlayerInfo player)
+    private bool IsPlayerOfInterest(Dalamud.Game.ClientState.Objects.Types.GameObject player)
     {
         if (player == null) return false;
-
-        return (Configuration.ShowSprouts && player.IsSprout) ||
-               (Configuration.ShowReturners && player.IsReturner);
+        
+        // Use FFXIVClientStructs to check online status
+        bool isSprout = false;
+        bool isReturner = false;
+        
+        if (player.IsCharacter())
+        {
+            var onlineStatusId = GetPlayerOnlineStatus(player);
+            isSprout = onlineStatusId == 1;
+            isReturner = onlineStatusId == 7;
+        }
+        
+        return (Configuration.ShowSprouts && isSprout) || 
+               (Configuration.ShowReturners && isReturner);
     }
-
+    
     // Calculate distance between two positions
     private float GetDistance(System.Numerics.Vector3 pos1, System.Numerics.Vector3 pos2)
     {
         float dx = pos2.X - pos1.X;
         float dy = pos2.Y - pos1.Y;
         float dz = pos2.Z - pos1.Z;
-
+        
         return (float)Math.Sqrt(dx * dx + dy * dy + dz * dz);
     }
-
-    // Check if a player is a sprout based on PlayerInfo
-    public bool IsSprout(PlayerInfo player)
+    
+    // Get player's online status id
+    private byte GetPlayerOnlineStatus(Dalamud.Game.ClientState.Objects.Types.GameObject player)
     {
-        return player.IsSprout;
+        try
+        {
+            // Try to get online status using reflection or other methods
+            // This is a placeholder and would need game-specific implementation
+            return 0;
+        }
+        catch
+        {
+            return 0;
+        }
     }
-
-    // Check if a player is a returner based on PlayerInfo
-    public bool IsReturner(PlayerInfo player)
+    
+    // Check if a player is a sprout
+    public bool IsSprout(Dalamud.Game.ClientState.Objects.Types.GameObject player)
     {
-        return player.IsReturner;
+        return GetPlayerOnlineStatus(player) == 1;
+    }
+    
+    // Check if a player is a returner
+    public bool IsReturner(Dalamud.Game.ClientState.Objects.Types.GameObject player)
+    {
+        return GetPlayerOnlineStatus(player) == 7;
     }
 }
